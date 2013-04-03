@@ -26,33 +26,22 @@ class TheWorld extends MetaClass {
     $this->initialize();
   }
 
-  public function initialize() {
-    if (!$this->isCli()) {
-      $this->arguments = new WebArguments();
-      $this->session = new NullSession();
-    }
-    else {
-      $this->arguments = new CliArguments();
-      $this->session = new MySession();
-    }
-
-
-
+  public function initializeWeb() {
+    $this->arguments = new WebArguments();
+    $this->session = new NullSession();
   }
 
-  /*
-  public function __get($key) {
-    return $this->container($key);
+  public function initializeCli($argv) {
+    $this->arguments = new CliArguments($argv);
+    $this->session = new MySession();
   }
 
-  public function __set($key, $val) {
-    $this->container[$key] = $val;
-  }
-  */
-
-  // debug
   public function isCli() {
+    if ($_ENV["PHP_IS_FRAMEWORK_WEB"]) {
+      return true;
+    }
+
+    return false;
   }
-  // end of debug
 
 }
