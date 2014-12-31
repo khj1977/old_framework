@@ -4,7 +4,7 @@
 
 require_once("framework/MetaClass.php");
 
-class DBData extends MetaClass {
+class KORM extends MetaClass {
 
   protected $tableName;
 
@@ -23,12 +23,12 @@ class DBData extends MetaClass {
 
   // protected $container;
   
-  public function __consruct($tableName) {
+  public function __construct($tableName) {
     $theWorld = TheWorld::instance();
     $this->slave = $theWorld->slave;
     $this->master = $theWorld->master;
 
-    $this->setPropNames();
+    // $this->setPropNames();
 
     $this->defaultFilter = null;
     $this->filter = null;
@@ -40,6 +40,9 @@ class DBData extends MetaClass {
     $this->container = array();
   }
 
+  protected function setPropNames() {
+
+  }
 
 
   public function fetchOne($where, $orderBy, $limit, $context) {
@@ -101,7 +104,7 @@ class DBData extends MetaClass {
           $result = array($context);
         }
         else {
-          $object = new DBData();
+          $object = new KORM();
           $object->$propName = $val;
           $result[] = $object;
         }
@@ -137,7 +140,7 @@ class DBData extends MetaClass {
 
   public function load() {
     if ($this->id === false) {
-      throw new Exception("DBData::load(): id is not specified.");
+      throw new Exception("KORM::load(): id is not specified.");
     }
     
     $where = array("id" => #this->id);
@@ -147,11 +150,14 @@ class DBData extends MetaClass {
   }
 
   public function autoSetColNames() {
+    $this->propNames = array();
+
     $sql = "DESCRIBE " . $this->tableName;
     $rows = $this->slave->query($sql);
     foreach($rows as $row) {
       $field = $row["Field"];
       $this->colNames[] = $field;
+
       if ($this->belongTo != null) {
         $modifiedField = "pri_" . $field;
         $this->propNames[$this->tableName][$field] = $modifiedField;
@@ -191,7 +197,7 @@ class DBData extends MetaClass {
 
   protected function saveUpdate() {
     if ($this->belongTo !== null) {
-      throw new Exception("DBData::saveUpdate(): saveUpdate() cannot be invoked when there is join.");
+      throw new Exception("KORM::saveUpdate(): saveUpdate() cannot be invoked when there is join.");
     }
 
     // update tablename set foo = bar where id = ?
@@ -217,7 +223,7 @@ class DBData extends MetaClass {
   // only invoked when there is no join.
   protected function saveNew() {
     if ($this->belongTo !== null) {
-      throw new Exception("DBData::saveNew(): saveNew() cannot be invoked when there is join.");
+      throw new Exception("KORM::saveNew(): saveNew() cannot be invoked when there is join.");
     }
 
     $sql = "INSERT INTO " . $this->tableName . " (";

@@ -7,6 +7,7 @@ require_once("framework/MetaClass.php");
 class BaseApp extends MetaClass {
 
   public function __consruct() {
+
   }
 
 }
